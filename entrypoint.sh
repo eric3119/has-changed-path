@@ -1,4 +1,4 @@
-#!/bin/sh -l
+#!/bin/bash -l
 set -euo pipefail
 
 SOURCE=${SOURCE:-.}
@@ -39,18 +39,13 @@ fi
 # 4. Get the latest commit in the searched paths
 LATEST_COMMIT_IN_PATH=$(git log -1 --format=format:%H --full-diff $PATHS_TO_SEARCH)
 
-MERGED_COMMIT_LIST=$(git rev-list --ancestry-path $LAST_COMMITTED_COMMIT..$LATEST_COMMIT)
-echo "$MERGED_COMMIT_LIST" | while IFS=" " read COMMIT
+while IFS=" " read COMMIT
 do
   if [ $COMMIT == $LATEST_COMMIT_IN_PATH ]; then
-    exit 0
-  fi
-done
-
-if [[ $? -eq 0 ]]; then
     echo ::set-output name=changed::true
     exit 0
-fi
+  fi
+done < <(git rev-list --ancestry-path $LAST_COMMITTED_COMMIT..$LATEST_COMMIT)
 
 echo "Code in the following paths has not changed:"
 echo $PATHS_TO_SEARCH
