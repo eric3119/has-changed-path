@@ -24,12 +24,22 @@ if [ -z "$PATHS_TO_SEARCH" ]; then
 fi
 
 # 3. Get the latest commit
-LATEST_COMMIT=$(git rev-parse HEAD)
+LATEST_COMMIT=$(git rev-parse HEAD~1)
+
+# 3-1. Get the count of commit history
+HISTORY_LENGTH=$(git rev-list --count --first-parent HEAD)
+
+if [ $HISTORY_LENGTH -eq 1 ]; then
+    echo "First commit"
+    echo ::set-output name=changed::true
+    exit 0
+fi
 
 # 4. Get the latest commit in the searched paths
 LATEST_COMMIT_IN_PATH=$(git log -1 --format=format:%H --full-diff $PATHS_TO_SEARCH)
 
-if [ $LATEST_COMMIT != $LATEST_COMMIT_IN_PATH ]; then
+
+if [ $LATEST_COMMIT == $LATEST_COMMIT_IN_PATH ]; then
     echo "Code in the following paths has not changed:"
     echo $PATHS_TO_SEARCH
     echo ::set-output name=changed::false
