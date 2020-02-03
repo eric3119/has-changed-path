@@ -39,7 +39,7 @@ fi
 # 4. Get the latest commit in the searched paths
 LATEST_COMMIT_IN_PATH=$(git log -1 --format=format:%H --full-diff $PATHS_TO_SEARCH)
 
-while IFS=" " read COMMIT
+while read COMMIT
 do
   if [ $COMMIT == $LATEST_COMMIT_IN_PATH ]; then
     echo ::set-output name=changed::true
